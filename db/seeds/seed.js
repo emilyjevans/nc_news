@@ -1,5 +1,5 @@
 const db = require("../connection");
-//const format = require("pg-format")
+const format = require("pg-format");
 
 const seed = (data) => {
   const { articleData, commentData, topicData, userData } = data;
@@ -11,7 +11,6 @@ const seed = (data) => {
     await db.query(`DROP TABLE IF EXISTS topics`);
     await db.query(`DROP TABLE IF EXISTS users`);
   }
-  // create topic data
 
   async function createTopicTable() {
     return db.query(`CREATE TABLE topics (
@@ -20,7 +19,6 @@ const seed = (data) => {
     );`);
   }
 
-  // create user table
   async function createUserTable() {
     return db.query(`CREATE TABLE users (
     username VARCHAR PRIMARY KEY,
@@ -33,7 +31,7 @@ const seed = (data) => {
     return db.query(`CREATE TABLE articles (
     article_id SERIAL PRIMARY KEY,
     title VARCHAR NOT NULL,
-    body TEXT,
+    body VARCHAR,
     votes INT DEFAULT 0, 
     topic VARCHAR REFERENCES topics(slug),
     author VARCHAR REFERENCES users(username),
@@ -48,22 +46,94 @@ const seed = (data) => {
     article_id INT REFERENCES articles(article_id),
     votes INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    body TEXT
+    body VARCHAR
   );`);
   }
 
-  async function createTables(){
+  // 2. insert data
+
+  async function insertTopicData() {
+    const queryStr = format(
+      `INSERT INTO topics
+    (slug, description)
+    VALUES
+    %L 
+    RETURNING *;`,
+      topicData.map((topic) => [topic.slug, topic.description])
+    );
+    return db.query(queryStr);
+  }
+
+  async function insertUserData() {
+    const queryStr = format(
+      `INSERT INTO users
+    (username, name, avatar_url)
+    VALUES
+    %L 
+    RETURNING *;`,
+      userData.map((user) => [user.username, user.name, user.avatar_url])
+    );
+    return db.query(queryStr);
+  }
+
+  async function insertArticleData() {
+    const queryStr = format(
+      `INSERT INTO articles
+    (title, topic, author, body, created_at, votes)
+    VALUES
+    %L 
+    RETURNING *;`,
+      articleData.map((article) => [
+        article.title,
+        article.topic,
+        article.author,
+        article.body,
+        article.created_at,
+        article.votes,
+      ])
+    );
+    return db.query(queryStr);
+  }
+
+  async function insertCommentData() {
+    const queryStr = format(
+      `INSERT INTO comments
+    (body, votes, author, article_id, created_at)
+    VALUES
+    %L 
+    RETURNING *;`,
+      commentData.map((comment) => [
+        comment.body,
+        comment.votes,
+        comment.author,
+        comment.article_id,
+        comment.created_at,
+      ])
+    );
+    return db.query(queryStr);
+  }
+
+  async function createTables() {
     await createTopicTable();
     await createUserTable();
     await createArticleTable();
     await createCommentTable();
   }
 
-  return deleteExistingTables().then(() => {
-    return createTables();
-  })
+  async function insertData() {
+    await insertTopicData();
+    await insertUserData();
+    await insertArticleData();
+    await insertCommentData();
+  }
 
-  // 2. insert data
+  // Run the async functions we have written  
+  return deleteExistingTables().then(() => {
+    return createTables().then(() => {
+      return insertData();
+    });
+  });
+  
 };
 
 module.exports = seed;
