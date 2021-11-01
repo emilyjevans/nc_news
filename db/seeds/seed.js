@@ -6,40 +6,64 @@ const seed = (data) => {
   // 1. create tables
 
   async function deleteExistingTables() {
-    const deleteTables = await Promise.all([
-      db.query(`DROP TABLE IF EXISTS article_data`),
-      db.query(`DROP TABLE IF EXISTS comment_data`),
-      db.query(`DROP TABLE IF EXISTS topic_data`),
-      db.query(`DROP TABLE IF EXISTS user_data`),
-    ]);
+    await db.query(`DROP TABLE IF EXISTS comments`);
+    await db.query(`DROP TABLE IF EXISTS articles`);
+    await db.query(`DROP TABLE IF EXISTS topics`);
+    await db.query(`DROP TABLE IF EXISTS users`);
   }
-
   // create topic data
 
-  async function createTables() {
-    return db.query(`CREATE TABLE topic_data (
-    slug SERIAL PRIMARY KEY,
+  async function createTopicTable() {
+    return db.query(`CREATE TABLE topics (
+    slug VARCHAR PRIMARY KEY,
     description VARCHAR
     );`);
   }
 
-  // // create article data table
-  // db.query(`CREATE TABLE article_data (
-  //   article_id SERIAL PRIMARY KEY,
-  //   title VARCHAR,
-  //   body TEXT,
-  //   votes defaults to 0
-  //   topic VARCHAR REFERENCES topics(slug)
-  //   author field that references a user's primary key (username)
-  //   created_at defaults to the current timestamp
-  // )`);
+  // create user table
+  async function createUserTable() {
+    return db.query(`CREATE TABLE users (
+    username VARCHAR PRIMARY KEY,
+    avatar_url TEXT,
+    name VARCHAR
+    );`);
+  }
+
+  async function createArticleTable() {
+    return db.query(`CREATE TABLE articles (
+    article_id SERIAL PRIMARY KEY,
+    title VARCHAR NOT NULL,
+    body TEXT,
+    votes INT DEFAULT 0, 
+    topic VARCHAR REFERENCES topics(slug),
+    author VARCHAR REFERENCES users(username),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );`);
+  }
+
+  async function createCommentTable() {
+    return db.query(`CREATE TABLE comments (
+    comment_id SERIAL PRIMARY KEY,
+    author VARCHAR REFERENCES users(username), 
+    article_id INT REFERENCES articles(article_id),
+    votes INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    body TEXT
+  );`);
+  }
+
+  async function createTables(){
+    await createTopicTable();
+    await createUserTable();
+    await createArticleTable();
+    await createCommentTable();
+  }
 
   return deleteExistingTables().then(() => {
     return createTables();
-  });
+  })
 
   // 2. insert data
 };
 
-//seed(data)
 module.exports = seed;
