@@ -1,6 +1,8 @@
 const { getArticle } = require("../controllers/articles.controller");
 const articlesRouter = require("express").Router();
 
-articlesRouter.get("/:article_id", getArticle);
+articlesRouter
+.route("/:article_id")
+.get(getArticle);
 
 module.exports = { articlesRouter };

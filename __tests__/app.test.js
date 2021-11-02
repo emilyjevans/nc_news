@@ -3,6 +3,7 @@ const testData = require("../db/data/test-data/index.js");
 const { seed } = require("../db/seeds/seed.js");
 const request = require("supertest");
 const app = require("../app");
+const { init } = require("../app");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -33,7 +34,7 @@ describe("ERRORS", () => {
       .get("/not_an_endpoint")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid URL");
+        expect(body.msg).toBe("Not found");
       });
   });
   it("/api/topics endpoint - client uses POST which is not allowed", () => {
@@ -73,13 +74,21 @@ describe("GET /api/articles/:article_id", () => {
 
 // Error handling // 
 
-describe.only("GET /api/articles/:article_id ERRORS", () => {
-  it("returns a status 400 and not found for a bad article_id", () => {
+describe("GET /api/articles/:article_id ERRORS", () => {
+  it("returns a status 400 and bad request for a bad article_id", () => {
     return request(app)
     .get('/api/articles/not_an_article')
     .expect(400)
     .then(({body})=> {
       expect(body.msg).toBe('Bad request')
+    })
+  })
+  it("returns a status 404 and not found for a well formed article_id that doesn't exist in the database", () => {
+    return request(app)
+    .get('/api/articles/999999')
+    .expect(404)
+    .then(({body}) => {
+      expect(body.msg).toBe('No article found for article_id: 999999')
     })
   })
 })
