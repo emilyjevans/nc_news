@@ -1,6 +1,7 @@
 const {
   selectArticle,
   increaseVotes,
+  selectAllArticles
 } = require("../models/articles.models.js");
 
 exports.getArticle = (req, res, next) => {
@@ -20,3 +21,10 @@ exports.patchArticle = (req, res, next) => {
   )
   .catch(next);
 };
+
+exports.getAllArticles = (req, res, next) => {
+  selectAllArticles()
+  .then((data) => {
+    res.status(200).send({ articles: data })
+  })
+}

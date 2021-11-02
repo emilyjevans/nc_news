@@ -138,22 +138,47 @@ describe("ERRORS - PATCH /api/articles/:article_id", () => {
   }); // Logic already covers this PSQL error
   it("there's an additional property on the request body, ignores additional property and completes with inc_votes", () => {
     return request(app)
-    .patch("/api/articles/3")
-    .send({ inc_votes: 5, name: 'Mitch' })
-    .expect(201)
-    .then((response) => {
-      const { body } = response;
-      expect(body.article).toEqual(
-        expect.objectContaining({
-          author: "icellusedkars",
-          title: "Eight pug gifs that remind me of mitch",
-          article_id: 3,
-          body: expect.any(String),
-          topic: "mitch",
-          created_at: expect.any(String),
-          votes: 5,
-        })
-      )
-    });
-  })
+      .patch("/api/articles/3")
+      .send({ inc_votes: 5, name: "Mitch" })
+      .expect(201)
+      .then((response) => {
+        const { body } = response;
+        expect(body.article).toEqual(
+          expect.objectContaining({
+            author: "icellusedkars",
+            title: "Eight pug gifs that remind me of mitch",
+            article_id: 3,
+            body: expect.any(String),
+            topic: "mitch",
+            created_at: expect.any(String),
+            votes: 5,
+          })
+        );
+      });
+  });
+});
+
+describe.only("GET /api/articles", () => {
+  it("responds with status 200 and an articles array of article objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeInstanceOf(Array);
+        body.articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              body: expect.any(String),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
 });

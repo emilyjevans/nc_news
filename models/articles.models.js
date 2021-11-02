@@ -48,3 +48,12 @@ exports.increaseVotes = (article_id, inc_votes) => {
     return rows[0]
   });
 };
+
+exports.selectAllArticles = () => {
+  console.log("in the model")
+  return db.query(
+    `SELECT * FROM articles`
+  ).then(({rows}) => {
+    return rows;
+  })
+}
