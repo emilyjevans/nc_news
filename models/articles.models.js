@@ -49,10 +49,11 @@ exports.increaseVotes = (article_id, inc_votes) => {
   });
 };
 
-exports.selectAllArticles = () => {
+exports.selectAllArticles = (sort_by = 'created_at') => {
   console.log("in the model")
   return db.query(
-    `SELECT * FROM articles`
+    `SELECT * FROM articles 
+    ORDER BY $1`, [sort_by]
   ).then(({rows}) => {
     return rows;
   })

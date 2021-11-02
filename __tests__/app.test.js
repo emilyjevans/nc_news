@@ -181,4 +181,34 @@ describe.only("GET /api/articles", () => {
         });
       });
   });
+  it("should sort by date by default", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        console.log(body.articles, "<<<<<")
+        expect(body.articles).toBeInstanceOf(Array);
+       
+        expect(body.articles).toBeSortedBy("created_at")
+
+        // Does the date data type need converting? 
+      })
+    });
+  it("should accept sort_by query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toBeSortedBy("article_id")
+      });
+  });
 });
+
+// Error handling
+
+// describe("ERRORS - GET /api/articles", () => {
+//   it("returns a 400 bad request for sort_by a column that doesn't exist")
+// })
