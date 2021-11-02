@@ -13,12 +13,14 @@ exports.selectArticle = (article_id) => {
   articles.topic,
   articles.created_at,
   articles.votes,
-  SUM(comments.votes) AS comment_count FROM articles
-  WHERE articles.articles_id = $1
-  LEFT JOIN comments on articles.article_id = comments.article_id;`,
-      article_id
+  COUNT(*) AS comment_count FROM articles
+  LEFT JOIN comments on articles.article_id = comments.article_id
+  WHERE articles.article_id = $1
+  GROUP BY articles.author, articles.title, articles.article_id, articles.body, articles.topic,
+  articles.created_at, articles.votes;`,
+      [ article_id ]
     )
     .then(({ rows }) => {
-      return rows;
+      return rows[0];
     });
 };
