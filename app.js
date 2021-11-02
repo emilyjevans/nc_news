@@ -3,6 +3,8 @@ const { PSQLerror, customError } = require("./controllers/errors.controller");
 const app = express();
 const { apiRouter } = require("./routes/api.router")
 
+app.use(express.json())
+
 app.use('/api', apiRouter)
 
 app.use(PSQLerror)

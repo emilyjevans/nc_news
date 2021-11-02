@@ -2,8 +2,6 @@ const db = require("../db/connection");
 
 //Need to add in template literal here //
 exports.selectArticle = (article_id) => {
-  console.log("in the model");
-
   return db
     .query(
       `SELECT articles.author, 
@@ -22,7 +20,7 @@ exports.selectArticle = (article_id) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-        console.log("rows")
+        console.log("rows");
         return Promise.reject({
           status: 404,
           msg: `No article found for article_id: ${article_id}`,
@@ -30,4 +28,18 @@ exports.selectArticle = (article_id) => {
       }
       return rows[0];
     });
+};
+
+exports.increaseVotes = (article_id, inc_votes) => {
+  console.log("in the model");
+  return db.query(
+    `UPDATE articles 
+     SET 
+     votes = votes + $1
+     WHERE article_id = $2
+     RETURNING *`, [inc_votes, article_id]
+  ).then(({ rows }) => {
+    console.log(rows)
+    return rows[0]
+  });
 };

@@ -3,7 +3,6 @@ const testData = require("../db/data/test-data/index.js");
 const { seed } = require("../db/seeds/seed.js");
 const request = require("supertest");
 const app = require("../app");
-const { init } = require("../app");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -70,25 +69,46 @@ describe("GET /api/articles/:article_id", () => {
   });
 });
 
-// This isn't preserving data types?
-
-// Error handling // 
+// Error handling //
 
 describe("GET /api/articles/:article_id ERRORS", () => {
   it("returns a status 400 and bad request for a bad article_id", () => {
     return request(app)
-    .get('/api/articles/not_an_article')
-    .expect(400)
-    .then(({body})=> {
-      expect(body.msg).toBe('Bad request')
-    })
-  })
+      .get("/api/articles/not_an_article")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
   it("returns a status 404 and not found for a well formed article_id that doesn't exist in the database", () => {
     return request(app)
-    .get('/api/articles/999999')
-    .expect(404)
-    .then(({body}) => {
-      expect(body.msg).toBe('No article found for article_id: 999999')
-    })
-  })
-})
+      .get("/api/articles/999999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("No article found for article_id: 999999");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  it("accepts an object in the form { inc_votes: newVote } and responds with the updated article, with the new number of votes", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({ inc_votes: 5 })
+      .expect(201)
+      .then((response) => {
+        const { body } = response;
+        expect(body.article).toEqual(
+          expect.objectContaining({
+            author: "icellusedkars",
+            title: "Eight pug gifs that remind me of mitch",
+            article_id: 3,
+            body: expect.any(String),
+            topic: "mitch",
+            created_at: expect.any(String),
+            votes: 5
+          })
+        );
+      });
+  });
+});

@@ -1,4 +1,7 @@
-const { selectArticle } = require("../models/articles.models.js");
+const {
+  selectArticle,
+  increaseVotes,
+} = require("../models/articles.models.js");
 
 exports.getArticle = (req, res, next) => {
   console.log("in the controller");
@@ -6,4 +9,12 @@ exports.getArticle = (req, res, next) => {
   selectArticle(article_id)
     .then((data) => res.status(200).send({ article: data }))
     .catch(next);
+};
+
+exports.patchArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+  increaseVotes(article_id, inc_votes).then((data) =>
+    res.status(201).send({ article: data })
+  );
 };

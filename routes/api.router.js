@@ -1,5 +1,5 @@
 const apiRouter = require("express").Router();
-const { getArticle } = require("../controllers/articles.controller.js");
+const { getArticle, patchArticle } = require("../controllers/articles.controller.js");
 const { invalidMethod } = require("../controllers/errors.controller.js");
 const { getTopics } = require("../controllers/topics.controller.js");
 
@@ -9,5 +9,6 @@ apiRouter.get("/topics", getTopics)
 .patch("/topics", invalidMethod);
 
 apiRouter.get("/articles/:article_id", getArticle)
+.patch("/articles/:article_id", patchArticle)
 
 module.exports = { apiRouter };

@@ -5,7 +5,7 @@ exports.invalidMethod = (req, res, next) => {
 };
 
 exports.PSQLerror = (err, req, res, next) => {
-  console.log("in the PSQL error")
+  console.log(err, "in the PSQL error")
   if (err.code === '22P02'){
     res.status(400).send({msg: 'Bad request'})
   }
