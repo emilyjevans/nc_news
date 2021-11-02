@@ -106,9 +106,54 @@ describe("PATCH /api/articles/:article_id", () => {
             body: expect.any(String),
             topic: "mitch",
             created_at: expect.any(String),
-            votes: 5
+            votes: 5,
           })
         );
       });
   });
+});
+
+// Error handling
+
+describe("ERRORS - PATCH /api/articles/:article_id", () => {
+  it("no inc_votes included on request body, returns status 400 Bad Request", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({ not_the_right_thing: "pasta" })
+      .expect(400)
+      .then((response) => {
+        const { body } = response;
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+  it("invalid inc_votes eg. { inc_votes : 'cat' }, returns 400 Bad Request", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({ inc_votes: "cat" })
+      .expect(400)
+      .then((response) => {
+        const { body } = response;
+        expect(body.msg).toEqual("Bad request");
+      });
+  }); // Logic already covers this PSQL error
+  it("there's an additional property on the request body, ignores additional property and completes with inc_votes", () => {
+    return request(app)
+    .patch("/api/articles/3")
+    .send({ inc_votes: 5, name: 'Mitch' })
+    .expect(201)
+    .then((response) => {
+      const { body } = response;
+      expect(body.article).toEqual(
+        expect.objectContaining({
+          author: "icellusedkars",
+          title: "Eight pug gifs that remind me of mitch",
+          article_id: 3,
+          body: expect.any(String),
+          topic: "mitch",
+          created_at: expect.any(String),
+          votes: 5,
+        })
+      )
+    });
+  })
 });

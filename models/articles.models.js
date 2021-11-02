@@ -32,6 +32,12 @@ exports.selectArticle = (article_id) => {
 
 exports.increaseVotes = (article_id, inc_votes) => {
   console.log("in the model");
+  if (!inc_votes){
+    return Promise.reject({
+      status: 400,
+      msg: 'Bad request'
+    })
+  }
   return db.query(
     `UPDATE articles 
      SET 
@@ -39,7 +45,6 @@ exports.increaseVotes = (article_id, inc_votes) => {
      WHERE article_id = $2
      RETURNING *`, [inc_votes, article_id]
   ).then(({ rows }) => {
-    console.log(rows)
     return rows[0]
   });
 };
