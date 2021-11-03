@@ -2,6 +2,7 @@ const {
   selectArticle,
   increaseVotes,
   selectAllArticles,
+  selectCommentsByArticle
 } = require("../models/articles.models.js");
 
 exports.getArticle = (req, res, next) => {
@@ -21,14 +22,20 @@ exports.patchArticle = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  const { sort_by, order, topic, author} = req.query;
-  console.log(req.query, "<<<<")
+  const { sort_by, order, topic, author } = req.query;
   selectAllArticles(sort_by, order, topic, author)
     .then((data) => {
       if (data.length === 0) {
-        res.status(204)
+        res.status(204);
       }
       res.status(200).send({ articles: data });
     })
     .catch(next);
+};
+
+exports.getCommentsByArticle = (req, res, next) => {
+  const { article_id } = req.query;
+  selectCommentsByArticle(article_id).then((data) => {
+    res.status(200).send({ comments: data });
+  });
 };

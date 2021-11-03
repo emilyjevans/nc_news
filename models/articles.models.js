@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkTopic } = "../utils/checkTopic.js";
 
 //Need to add in template literal here //
 exports.selectArticle = (article_id) => {
@@ -60,27 +61,28 @@ exports.selectAllArticles = (
   console.log("in the model");
 
   const sortByEntries = [
-    'author',
-    'title',
-    'article_id',
-    'body',
-    'topic',
-    'created_at',
-    'votes',
+    "author",
+    "title",
+    "article_id",
+    "body",
+    "topic",
+    "created_at",
+    "votes",
   ];
 
-  const orderByEntries = [
-    'asc', 'desc'
-  ]
+  const orderByEntries = ["asc", "desc"];
 
-  if(!sortByEntries.includes(sort_by)){
+  // Utils function - check topic exists in database
+  // checkTopic(topic)
+
+  if (!sortByEntries.includes(sort_by)) {
     return Promise.reject({
       status: 400,
       msg: "Bad request",
     });
   }
 
-  if(!orderByEntries.includes(order)){
+  if (!orderByEntries.includes(order)) {
     return Promise.reject({
       status: 400,
       msg: "Bad request",
@@ -90,27 +92,31 @@ exports.selectAllArticles = (
   let sqlQuery = `SELECT * FROM articles`;
   const queries = [sort_by, order];
 
-  if (topic !== null && author !== null){
-    console.log("1")
-    sqlQuery += ` WHERE topic = $3 AND author = $4`
-    queries.push(author)
+  if (topic !== null && author !== null) {
+    sqlQuery += ` WHERE topic = $3 AND author = $4`;
+    queries.push(author);
   }
   if (topic !== null && author === null) {
-    console.log("2")
     sqlQuery += ` WHERE topic = $3`;
     queries.push(topic);
   }
-  if (author !== null && topic === null){
-    console.log("3")
-    sqlQuery += ` WHERE author = $3`
-    queries.push(author)
+  if (author !== null && topic === null) {
+    sqlQuery += ` WHERE author = $3`;
+    queries.push(author);
   }
 
   sqlQuery += ` ORDER BY $1, $2`;
 
   return db.query(sqlQuery, queries).then(({ rows }) => {
-
-
     return rows;
   });
+};
+
+exports.selectCommentsByArticle = (article_id) => {
+  return db
+    .query(`SELECT * from comments WHERE article_id = $1`, [article_id])
+    .then(({ rows }) => {
+      console.log(rows, "<<<<< rows");
+      return rows;
+    });
 };

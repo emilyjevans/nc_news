@@ -232,7 +232,7 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  it.only("should be able to filter by author", () => {
+  it("should be able to filter by author", () => {
     return request(app)
       .get("/api/articles?author=butter_bridge")
       .expect(200)
@@ -291,9 +291,37 @@ describe("ERRORS - GET /api/articles", () => {
         expect(body.msg).toEqual("Bad request");
       });
   });
-  it("returns a 204 Not Found for topic which is not in the database", () => {
+  it("returns a 400 Not Found for topic which is not in the database", () => {
     return request(app)
       .get("/api/articles?topic=not_a_topic")
-      .expect(204) // No body message 
+      .expect(400)
+      .then((response) => {
+        const { body } = response;
+        expect(body.msg).toEqual("Not found");
+      });
+  }); //Coming back to this when brain is less fried :) Error code 204 when topic exists but no articles
+});
+
+describe.only("GET /api/articles/:article_id/comments", () => {
+  it("should respond with an array of comments for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.comments).toBeInstanceOf(Array);
+        expect(body.comments).toHaveLength(2);
+        body.comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+            })
+          );
+        });
+      });
   });
 });
