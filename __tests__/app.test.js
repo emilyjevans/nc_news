@@ -302,7 +302,7 @@ describe("ERRORS - GET /api/articles", () => {
   }); //Coming back to this when brain is less fried :) Error code 204 when topic exists but no articles
 });
 
-describe.only("GET /api/articles/:article_id/comments", () => {
+describe("GET /api/articles/:article_id/comments", () => {
   it("should respond with an array of comments for the given article_id", () => {
     return request(app)
       .get("/api/articles/3/comments")
@@ -325,3 +325,26 @@ describe.only("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+// Error handling 
+
+describe.only("GET /api/articles/:article_id/comments", () => {
+  it("returns a 404 not found for an article id that doesn't exist", () => {
+    return request(app)
+    .get("/api/articles/999999/comments")
+    .expect(404)
+    .then((response) => {
+      const { body } = response;
+      expect(body.msg).toEqual("No article found for article_id: 999999");
+    });
+  })
+  it("returns a status 400 and bad request for a bad article_id", () => {
+    return request(app)
+      .get("/api/articles/not_an_article/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+}) // Is there any other errors here?? 
+

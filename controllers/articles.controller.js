@@ -34,8 +34,9 @@ exports.getAllArticles = (req, res, next) => {
 };
 
 exports.getCommentsByArticle = (req, res, next) => {
-  const { article_id } = req.query;
+  const { article_id } = req.params;
   selectCommentsByArticle(article_id).then((data) => {
     res.status(200).send({ comments: data });
-  });
+  })
+  .catch(next)
 };
