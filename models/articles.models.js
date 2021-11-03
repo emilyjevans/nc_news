@@ -20,7 +20,6 @@ exports.selectArticle = (article_id) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-        console.log("rows");
         return Promise.reject({
           status: 404,
           msg: `No article found for article_id: ${article_id}`,
@@ -55,23 +54,63 @@ exports.increaseVotes = (article_id, inc_votes) => {
 exports.selectAllArticles = (
   sort_by = "created_at",
   order = "desc",
-  topic = null
+  topic = null,
+  author = null
 ) => {
   console.log("in the model");
-  let sqlQuery = `SELECT * FROM articles`
-  
+
+  const sortByEntries = [
+    'author',
+    'title',
+    'article_id',
+    'body',
+    'topic',
+    'created_at',
+    'votes',
+  ];
+
+  const orderByEntries = [
+    'asc', 'desc'
+  ]
+
+  if(!sortByEntries.includes(sort_by)){
+    return Promise.reject({
+      status: 400,
+      msg: "Bad request",
+    });
+  }
+
+  if(!orderByEntries.includes(order)){
+    return Promise.reject({
+      status: 400,
+      msg: "Bad request",
+    });
+  }
+
+  let sqlQuery = `SELECT * FROM articles`;
   const queries = [sort_by, order];
 
-  if (topic !== null) {
-    
+  if (topic !== null && author !== null){
+    console.log("1")
+    sqlQuery += ` WHERE topic = $3 AND author = $4`
+    queries.push(author)
+  }
+  if (topic !== null && author === null) {
+    console.log("2")
     sqlQuery += ` WHERE topic = $3`;
-    queries.push(topic)
-    console.log(sqlQuery, "<<<<")
+    queries.push(topic);
+  }
+  if (author !== null && topic === null){
+    console.log("3")
+    sqlQuery += ` WHERE author = $3`
+    queries.push(author)
   }
 
   sqlQuery += ` ORDER BY $1, $2`;
 
   return db.query(sqlQuery, queries).then(({ rows }) => {
+
+
     return rows;
   });
 };

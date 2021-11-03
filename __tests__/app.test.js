@@ -158,6 +158,8 @@ describe("ERRORS - PATCH /api/articles/:article_id", () => {
   });
 });
 
+//* This one is supposed to have comment count *//
+//* Need to have filter by author in here too *//
 describe("GET /api/articles", () => {
   it("responds with status 200 and an articles array of article objects", () => {
     return request(app)
@@ -181,20 +183,18 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  // it.only("should sort by date descending by default", () => {
-  //   return request(app)
-  //     .get("/api/articles")
-  //     .expect(200)
-  //     .then((response) => {
-  //       const { body } = response;
-  //       console.log(body.articles, "<<<<<")
-  //       expect(body.articles).toBeInstanceOf(Array);
-  //       expect(body.articles).toBeSorted({ ascending: false})
-  //       expect(body.articles).toBeSortedBy("created_at")
-
-  //       // Does the date data type need converting?
-  //     })
-  //   });
+  it("should sort by date descending by default", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toBeSorted({ ascending: false });
+        // expect(body.articles).toBeSortedBy("created_at")
+        // Does the date data type need converting?
+      });
+  });
   it("should accept sort_by query", () => {
     return request(app)
       .get("/api/articles?sort_by=article_id")
@@ -215,7 +215,7 @@ describe("GET /api/articles", () => {
         expect(body.articles).toBeSorted({ ascending: true });
       });
   });
-  it.only("should be able to filter by topic", () => {
+  it("should be able to filter by topic", () => {
     return request(app)
       .get("/api/articles?topic=cats")
       .expect(200)
@@ -232,18 +232,68 @@ describe("GET /api/articles", () => {
         });
       });
   });
+  it.only("should be able to filter by author", () => {
+    return request(app)
+      .get("/api/articles?author=butter_bridge")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(3);
+        body.articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              author: "butter_bridge",
+            })
+          );
+        });
+      });
+  });
+  it("should be able to use all three queries", () => {
+    return request(app)
+      .get("/api/articles?topic=cats&order=asc&sort_by=article_id")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(1);
+        expect(body.articles).toBeSorted({ ascending: true });
+        expect(body.articles).toBeSortedBy("article_id");
+        body.articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              topic: "cats",
+            })
+          );
+        });
+      });
+  });
 });
 
 // Error handling
 
-// describe.only("ERRORS - GET /api/articles", () => {
-//   it("returns a 400 bad request for sort_by a column that doesn't exist", () => {
-//     return request(app)
-//       .get("/api/articles?sort_by=not_a_variable")
-//       .expect(400)
-//       .then((response) => {
-//         const { body } = response;
-//         expect(body.msg).toEqual("Bad request");
-//       });
-//   });
-// });
+describe("ERRORS - GET /api/articles", () => {
+  it("returns a 400 bad request for sort_by a column that doesn't exist", () => {
+    return request(app)
+      .get("/api/articles?sort_by=not_a_variable")
+      .expect(400)
+      .then((response) => {
+        const { body } = response;
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+  it("returns a 400 bad request for order which isn't 'asc' or 'desc' ", () => {
+    return request(app)
+      .get("/api/articles?order=not_an_order")
+      .expect(400)
+      .then((response) => {
+        const { body } = response;
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+  it("returns a 204 Not Found for topic which is not in the database", () => {
+    return request(app)
+      .get("/api/articles?topic=not_a_topic")
+      .expect(204) // No body message 
+  });
+});
