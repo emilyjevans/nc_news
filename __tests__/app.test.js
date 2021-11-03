@@ -326,18 +326,18 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-// Error handling 
+// Error handling
 
 describe("GET /api/articles/:article_id/comments", () => {
   it("returns a 404 not found for an article id that doesn't exist", () => {
     return request(app)
-    .get("/api/articles/999999/comments")
-    .expect(404)
-    .then((response) => {
-      const { body } = response;
-      expect(body.msg).toEqual("No article found for article_id: 999999");
-    });
-  })
+      .get("/api/articles/999999/comments")
+      .expect(404)
+      .then((response) => {
+        const { body } = response;
+        expect(body.msg).toEqual("No article found for article_id: 999999");
+      });
+  });
   it("returns a status 400 and bad request for a bad article_id", () => {
     return request(app)
       .get("/api/articles/not_an_article/comments")
@@ -346,26 +346,79 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Bad request");
       });
   });
-}) 
+});
 
-describe.only("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
   it("should take a request body with properties username and body and respond with the posted comment", () => {
-    const myComment = {username: "lurker", body: "A very interesting comment"}
+    const myComment = {
+      username: "lurker",
+      body: "A very interesting comment",
+    };
     return request(app)
-    .post("/api/articles/3/comments")
-    .send(myComment)
-    .expect(201)
-    .then(({body}) => {
-      expect(body.comment).toEqual(expect.objectContaining({
-        comment_id: expect.any(Number),
-        body: "A very interesting comment",
-        votes: 0,
-        author: "lurker",
-        article_id: 3, 
-        created_at: expect.any(String)
-      }))
-    })
-  })
-})
+      .post("/api/articles/3/comments")
+      .send(myComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            body: "A very interesting comment",
+            votes: 0,
+            author: "lurker",
+            article_id: 3,
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+});
 
-// 
+// Error handling
+describe.only("ERRORS POST /api/articles/:article_id/comments", () => {
+  it("returns a status 400 and bad request for a bad article_id", () => {
+    const myComment = {
+      username: "lurker",
+      body: "A very interesting comment",
+    };
+    return request(app)
+      .post("/api/articles/not_an_article/comments")
+      .send(myComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+  it("returns a 400 and bad request for an article_id that doesn't exist", () => {
+    const myComment = {
+      username: "lurker",
+      body: "A very interesting comment",
+    };
+    return request(app)
+      .post("/api/articles/999999/comments")
+      .send(myComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+  it("returns a 400 and bad request for a username that doesn't exist", () => {
+    const myComment = { username: "emily", body: "A very interesting comment" };
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(myComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+  it("returns a 400 for an empty comment", () => {
+    const myComment = { username: "lurker" };
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(myComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Blank comments are not accepted");
+      });
+  });
+});

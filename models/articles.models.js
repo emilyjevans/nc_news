@@ -127,6 +127,12 @@ exports.selectCommentsByArticle = (article_id) => {
 };
 
 exports.insertComment = (article_id, username, body) => {
+  if (!body){
+    return Promise.reject({
+      status: 400,
+      msg: `Blank comments are not accepted`,
+    });
+  }
   return db.query(
     `INSERT INTO comments (body, author, article_id)
     VALUES ($1, $2, $3)
