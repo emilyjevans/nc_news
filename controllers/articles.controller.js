@@ -2,7 +2,8 @@ const {
   selectArticle,
   increaseVotes,
   selectAllArticles,
-  selectCommentsByArticle
+  selectCommentsByArticle,
+  insertComment
 } = require("../models/articles.models.js");
 
 exports.getArticle = (req, res, next) => {
@@ -35,8 +36,19 @@ exports.getAllArticles = (req, res, next) => {
 
 exports.getCommentsByArticle = (req, res, next) => {
   const { article_id } = req.params;
-  selectCommentsByArticle(article_id).then((data) => {
-    res.status(200).send({ comments: data });
-  })
-  .catch(next)
+  selectCommentsByArticle(article_id)
+    .then((data) => {
+      res.status(200).send({ comments: data });
+    })
+    .catch(next);
+};
+
+exports.postComment = (req, res, next) => {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+  insertComment(article_id, username, body)
+    .then((data) => {
+      res.status(201).send({ comment: data });
+    })
+    .catch(next);
 };

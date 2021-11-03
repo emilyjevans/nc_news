@@ -328,7 +328,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 
 // Error handling 
 
-describe.only("GET /api/articles/:article_id/comments", () => {
+describe("GET /api/articles/:article_id/comments", () => {
   it("returns a 404 not found for an article id that doesn't exist", () => {
     return request(app)
     .get("/api/articles/999999/comments")
@@ -346,5 +346,26 @@ describe.only("GET /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Bad request");
       });
   });
-}) // Is there any other errors here?? 
+}) 
 
+describe.only("POST /api/articles/:article_id/comments", () => {
+  it("should take a request body with properties username and body and respond with the posted comment", () => {
+    const myComment = {username: "lurker", body: "A very interesting comment"}
+    return request(app)
+    .post("/api/articles/3/comments")
+    .send(myComment)
+    .expect(201)
+    .then(({body}) => {
+      expect(body.comment).toEqual(expect.objectContaining({
+        comment_id: expect.any(Number),
+        body: "A very interesting comment",
+        votes: 0,
+        author: "lurker",
+        article_id: 3, 
+        created_at: expect.any(String)
+      }))
+    })
+  })
+})
+
+// 
