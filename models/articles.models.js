@@ -11,7 +11,7 @@ exports.selectArticle = (article_id) => {
   articles.topic,
   articles.created_at,
   articles.votes,
-  COUNT(*) AS comment_count FROM articles
+  COUNT(*)::int AS comment_count FROM articles
   LEFT JOIN comments on articles.article_id = comments.article_id
   WHERE articles.article_id = $1
   GROUP BY articles.author, articles.title, articles.article_id, articles.body, articles.topic,
@@ -32,29 +32,46 @@ exports.selectArticle = (article_id) => {
 
 exports.increaseVotes = (article_id, inc_votes) => {
   console.log("in the model");
-  if (!inc_votes){
+  if (!inc_votes) {
     return Promise.reject({
       status: 400,
-      msg: 'Bad request'
-    })
+      msg: "Bad request",
+    });
   }
-  return db.query(
-    `UPDATE articles 
+  return db
+    .query(
+      `UPDATE articles 
      SET 
      votes = votes + $1
      WHERE article_id = $2
-     RETURNING *`, [inc_votes, article_id]
-  ).then(({ rows }) => {
-    return rows[0]
-  });
+     RETURNING *`,
+      [inc_votes, article_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
 };
 
-exports.selectAllArticles = (sort_by = 'created_at') => {
-  console.log("in the model")
-  return db.query(
-    `SELECT * FROM articles 
-    ORDER BY $1`, [sort_by]
-  ).then(({rows}) => {
+exports.selectAllArticles = (
+  sort_by = "created_at",
+  order = "desc",
+  topic = null
+) => {
+  console.log("in the model");
+  let sqlQuery = `SELECT * FROM articles`
+  
+  const queries = [sort_by, order];
+
+  if (topic !== null) {
+    
+    sqlQuery += ` WHERE topic = $3`;
+    queries.push(topic)
+    console.log(sqlQuery, "<<<<")
+  }
+
+  sqlQuery += ` ORDER BY $1, $2`;
+
+  return db.query(sqlQuery, queries).then(({ rows }) => {
     return rows;
-  })
-}
+  });
+};

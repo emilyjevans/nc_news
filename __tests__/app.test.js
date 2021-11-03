@@ -62,7 +62,7 @@ describe("GET /api/articles/:article_id", () => {
             topic: "mitch",
             created_at: expect.any(String),
             votes: 0,
-            comment_count: "2",
+            comment_count: 2,
           })
         );
       });
@@ -158,7 +158,7 @@ describe("ERRORS - PATCH /api/articles/:article_id", () => {
   });
 });
 
-describe.only("GET /api/articles", () => {
+describe("GET /api/articles", () => {
   it("responds with status 200 and an articles array of article objects", () => {
     return request(app)
       .get("/api/articles")
@@ -181,20 +181,20 @@ describe.only("GET /api/articles", () => {
         });
       });
   });
-  it("should sort by date by default", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then((response) => {
-        const { body } = response;
-        console.log(body.articles, "<<<<<")
-        expect(body.articles).toBeInstanceOf(Array);
-       
-        expect(body.articles).toBeSortedBy("created_at")
+  // it.only("should sort by date descending by default", () => {
+  //   return request(app)
+  //     .get("/api/articles")
+  //     .expect(200)
+  //     .then((response) => {
+  //       const { body } = response;
+  //       console.log(body.articles, "<<<<<")
+  //       expect(body.articles).toBeInstanceOf(Array);
+  //       expect(body.articles).toBeSorted({ ascending: false})
+  //       expect(body.articles).toBeSortedBy("created_at")
 
-        // Does the date data type need converting? 
-      })
-    });
+  //       // Does the date data type need converting?
+  //     })
+  //   });
   it("should accept sort_by query", () => {
     return request(app)
       .get("/api/articles?sort_by=article_id")
@@ -202,13 +202,48 @@ describe.only("GET /api/articles", () => {
       .then((response) => {
         const { body } = response;
         expect(body.articles).toBeInstanceOf(Array);
-        expect(body.articles).toBeSortedBy("article_id")
+        expect(body.articles).toBeSortedBy("article_id");
+      });
+  });
+  it("should accept ascending or descending", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toBeSorted({ ascending: true });
+      });
+  });
+  it.only("should be able to filter by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(1);
+        body.articles.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              topic: "cats",
+            })
+          );
+        });
       });
   });
 });
 
 // Error handling
 
-// describe("ERRORS - GET /api/articles", () => {
-//   it("returns a 400 bad request for sort_by a column that doesn't exist")
-// })
+// describe.only("ERRORS - GET /api/articles", () => {
+//   it("returns a 400 bad request for sort_by a column that doesn't exist", () => {
+//     return request(app)
+//       .get("/api/articles?sort_by=not_a_variable")
+//       .expect(400)
+//       .then((response) => {
+//         const { body } = response;
+//         expect(body.msg).toEqual("Bad request");
+//       });
+//   });
+// });

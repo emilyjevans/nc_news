@@ -23,8 +23,8 @@ exports.patchArticle = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  const { sort_by } = req.params;
-  selectAllArticles(sort_by)
+  const { sort_by, order, topic } = req.query;
+  selectAllArticles(sort_by, order, topic)
   .then((data) => {
     res.status(200).send({ articles: data })
   })
