@@ -24,10 +24,10 @@
   "dependencies": {
     "express": "^4.17.1",
     "pg": "^8.7.1",
-    "pg-format": "^1.0.4"
+    "pg-format": "^1.0.4",
+    "dotenv": "^10.0.0"
   },
   "devDependencies": {
-    "dotenv": "^10.0.0",
     "jest-sorted": "^1.0.12",
     "supertest": "^6.1.6"
   },
