@@ -453,13 +453,13 @@ describe("ERRORS - DELETE /api/comments/:comment_id", () => {
   });
 });
 
-// describe("GET /api", () => {
-//   it("should respond with a JSON describing all the available endpoints on the API", () => {
-//     return request(app)
-//       .get("/api")
-//       .expect(200)
-//       .then(({ body }) => {
-//         expect(body.object).toEqual;
-//       });
-//   });
-// });
+describe("GET /api", () => {
+  it("should respond with a JSON describing all the available endpoints on the API", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        // expect(body.object).toEqual;
+      });
+  });
+});

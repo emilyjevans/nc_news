@@ -7,12 +7,7 @@ const {
   deleteComment,
 } = require("../models/articles.models.js");
 
-const { getTopicsFromDatabase } = require("../utils/getTopics");
-
-const { checkTopics } = require("../utils/getTopics");
-
 exports.getArticle = (req, res, next) => {
-  console.log("in the controller");
   const { article_id } = req.params;
   selectArticle(article_id)
     .then((data) => res.status(200).send({ article: data }))
@@ -59,10 +54,10 @@ exports.postComment = (req, res, next) => {
 };
 
 exports.removeComment = (req, res, next) => {
-  console.log("in the controller")
   const { comment_id } = req.params;
-  deleteComment(comment_id).then((data) => {
-    res.status(204).send();
-  })
-  .catch(next)
+  deleteComment(comment_id)
+    .then((data) => {
+      res.status(204).send();
+    })
+    .catch(next);
 };

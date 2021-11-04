@@ -23,5 +23,14 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an object",
+    "queries": [],
+    "exampleResponse": {
+      "article": [
+        
+      ]
+    }
   }
 }

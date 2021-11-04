@@ -1,6 +1,6 @@
 const db = require("../db/connection");
-const { checkTopicsFromDatabase } = require("../utils/getTopics");
-const { getTopicsFromDatabase } = require("../utils/getTopics");
+const { checkTopicsFromDatabase } = require("../utils/checkTopicsFromDatabase");
+const { getTopicsFromDatabase } = require("../utils/checkTopicsFromDatabase");
 
 //Need to add in template literal here //
 exports.selectArticle = (article_id) => {
@@ -32,7 +32,6 @@ exports.selectArticle = (article_id) => {
 };
 
 exports.increaseVotes = (article_id, inc_votes) => {
-  console.log("in the model");
   if (!inc_votes) {
     return Promise.reject({
       status: 400,
@@ -59,8 +58,6 @@ exports.selectAllArticles = async (
   topic = null,
   author = null
 ) => {
-  console.log("in the model");
-
   const sortByEntries = [
     "author",
     "title",
@@ -110,7 +107,6 @@ exports.selectAllArticles = async (
   if (!rows.length && topic) {
     await checkTopicsFromDatabase(topic);
   }
-
   return rows;
 };
 
@@ -148,7 +144,6 @@ exports.insertComment = (article_id, username, body) => {
 };
 
 exports.deleteComment = (comment_id) => {
-  console.log("in the model");
   return db
     .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *;`, [
       comment_id,
