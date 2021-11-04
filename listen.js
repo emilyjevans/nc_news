@@ -1,4 +1,5 @@
-const app = ("./app.js")
+const app  = require("./app.js")
+console.log(app)
 
 const { PORT = 9090 } = process.env;
 
