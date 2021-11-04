@@ -1,6 +1,5 @@
-const request = require("superagent");
 const db = require("../db/connection");
-const { getTopicsFromDatabase } = require("../utils/getTopics")
+const { getTopicsFromDatabase } = require("../utils/getTopics");
 
 //Need to add in template literal here //
 exports.selectArticle = (article_id) => {
@@ -74,7 +73,7 @@ exports.selectAllArticles = (
   const orderByEntries = ["asc", "desc"];
 
   // Check topic exists in database
-  
+
   // async function checkTopic() {
   //   const topics = await getTopicsFromDatabase()
   //   return topics;
@@ -82,7 +81,7 @@ exports.selectAllArticles = (
 
   // const topics = await checkTopic();
 
-  // console.log(topics) /// ?? 
+  // console.log(topics) /// ??
 
   // if(!topics.includes(topic)){
   //   return Promise.reject({
@@ -143,17 +142,20 @@ exports.selectCommentsByArticle = (article_id) => {
 };
 
 exports.insertComment = (article_id, username, body) => {
-  if (!body){
+  if (!body) {
     return Promise.reject({
       status: 400,
       msg: `Blank comments are not accepted`,
     });
   }
-  return db.query(
-    `INSERT INTO comments (body, author, article_id)
+  return db
+    .query(
+      `INSERT INTO comments (body, author, article_id)
     VALUES ($1, $2, $3)
-    RETURNING *;`, [body, username, article_id]
-  ).then(({rows})=>{
-    return rows[0]
-  })
-}
+    RETURNING *;`,
+      [body, username, article_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
