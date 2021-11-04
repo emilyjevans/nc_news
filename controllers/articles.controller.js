@@ -3,8 +3,13 @@ const {
   increaseVotes,
   selectAllArticles,
   selectCommentsByArticle,
-  insertComment
+  insertComment,
+  deleteComment,
 } = require("../models/articles.models.js");
+
+const { getTopicsFromDatabase } = require("../utils/getTopics");
+
+const { checkTopics } = require("../utils/getTopics");
 
 exports.getArticle = (req, res, next) => {
   console.log("in the controller");
@@ -26,6 +31,7 @@ exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, topic, author } = req.query;
   selectAllArticles(sort_by, order, topic, author)
     .then((data) => {
+      console.log(data);
       if (data.length === 0) {
         res.status(204);
       }
@@ -51,4 +57,13 @@ exports.postComment = (req, res, next) => {
       res.status(201).send({ comment: data });
     })
     .catch(next);
+};
+
+exports.removeComment = (req, res, next) => {
+  console.log("in the controller")
+  const { comment_id } = req.params;
+  deleteComment(comment_id).then((data) => {
+    res.status(204).send();
+  })
+  .catch(next)
 };

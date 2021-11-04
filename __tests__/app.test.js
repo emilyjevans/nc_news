@@ -1,6 +1,6 @@
 const db = require("../db/connection.js");
 const testData = require("../db/data/test-data/index.js");
-const { seed } = require("../db/seeds/seed.js");
+const seed  = require("../db/seeds/seed.js");
 const request = require("supertest");
 const app = require("../app");
 
@@ -291,23 +291,19 @@ describe("ERRORS - GET /api/articles", () => {
         expect(body.msg).toEqual("Bad request");
       });
   });
-  // it("returns a 400 Not Found for topic which is not in the database", () => {
-  //   return request(app)
-  //     .get("/api/articles?topic=not_a_topic")
-  //     .expect(400)
-  //     .then((response) => {
-  //       const { body } = response;
-  //       expect(body.msg).toEqual("Not found");
-  //     });
-  // });
+  it("returns a 404 Not Found for topic which is not in the database", () => {
+    return request(app)
+      .get("/api/articles?topic=not_a_topic")
+      .expect(404)
+      .then((response) => {
+        const { body } = response;
+        expect(body.msg).toEqual("Not found");
+      });
+  });
   // it.only("returns a 204 No content for topic which exists but does not have any articles associated with it", () => {
   //   return request(app)
   //   .get("/api/articles?topic=paper")
   //   .expect(204)
-  //   .then((response) => {
-  //     const { body } = response;
-  //     expect(body.msg).toEqual("No content");
-  //   });
   // });
   //Coming back to this when brain is less fried :) Error code 204 when topic exists but no articles
 });
@@ -432,3 +428,18 @@ describe("ERRORS POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+
+describe("DELETE /api/comments/:comment_id", () => {
+  it("Should delete the given comment by comment_id", () => {
+    return request(app)
+    .delete("/api/comments/1")
+    .expect(204)
+  })
+})
+
+// Error handling 
+
+// describe("ERRORS - DELETE /api/comments/:comment_id", () => {
+//   it("Should return 400 Bad request ")
+// })

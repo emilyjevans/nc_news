@@ -5,6 +5,7 @@ const {
   patchArticle,
   getCommentsByArticle,
   postComment,
+  removeComment,
 } = require("../controllers/articles.controller.js");
 const { invalidMethod } = require("../controllers/errors.controller.js");
 const { getTopics } = require("../controllers/topics.controller.js");
@@ -24,5 +25,7 @@ apiRouter
   .get(getCommentsByArticle)
   .post(postComment)
   .all(invalidMethod);
+
+apiRouter.route("/comments/:comment_id").delete(removeComment);
 
 module.exports = { apiRouter };
