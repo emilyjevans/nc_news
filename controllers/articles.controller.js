@@ -31,9 +31,8 @@ exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, topic, author } = req.query;
   selectAllArticles(sort_by, order, topic, author)
     .then((data) => {
-      console.log(data);
       if (data.length === 0) {
-        res.status(204);
+        res.status(204).send();
       }
       res.status(200).send({ articles: data });
     })

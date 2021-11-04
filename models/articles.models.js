@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkTopicsFromDatabase } = require("../utils/getTopics");
 const { getTopicsFromDatabase } = require("../utils/getTopics");
 
 //Need to add in template literal here //
@@ -52,7 +53,7 @@ exports.increaseVotes = (article_id, inc_votes) => {
     });
 };
 
-exports.selectAllArticles = (
+exports.selectAllArticles = async (
   sort_by = "created_at",
   order = "desc",
   topic = null,
@@ -104,27 +105,13 @@ exports.selectAllArticles = (
 
   sqlQuery += ` ORDER BY $1, $2`;
 
-  console.log(sqlQuery, "<<<");
+  const { rows } = await db.query(sqlQuery, queries);
 
-  return getTopicsFromDatabase()
-    .then((topics) => {
-      if (!topics.includes(topic)) {
-        return Promise.reject({
-          status: 404,
-          msg: "Not found",
-        });
-      }
-      db.query(sqlQuery, queries);
-    })
-    .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({
-          status: 204,
-          msg: "No content",
-        });
-      }
-      return rows;
-    });
+  if (!rows.length && topic) {
+    await checkTopicsFromDatabase(topic);
+  }
+
+  return rows;
 };
 
 exports.selectCommentsByArticle = (article_id) => {
@@ -163,9 +150,11 @@ exports.insertComment = (article_id, username, body) => {
 exports.deleteComment = (comment_id) => {
   console.log("in the model");
   return db
-    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *;`, [comment_id])
-    .then(({rows}) => {
-      if (rows.length === 0){
+    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *;`, [
+      comment_id,
+    ])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
         return Promise.reject({
           status: 400,
           msg: `Bad request`,

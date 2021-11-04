@@ -300,12 +300,9 @@ describe("ERRORS - GET /api/articles", () => {
         expect(body.msg).toEqual("Not found");
       });
   });
-  // it.only("returns a 204 No content for topic which exists but does not have any articles associated with it", () => {
-  //   return request(app)
-  //   .get("/api/articles?topic=paper")
-  //   .expect(204)
-  // });
-  //Coming back to this when brain is less fried :) Error code 204 when topic exists but no articles
+  it("returns a 204 No content for topic which exists but does not have any articles associated with it", () => {
+    return request(app).get("/api/articles?topic=paper").expect(204);
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -446,4 +443,23 @@ describe("ERRORS - DELETE /api/comments/:comment_id", () => {
         expect(body.msg).toEqual("Bad request");
       });
   });
+  it("Should return 400 Bad request for a badly formed comment ID", () => {
+    return request(app)
+      .delete("/api/comments/not_a_comment")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
 });
+
+// describe("GET /api", () => {
+//   it("should respond with a JSON describing all the available endpoints on the API", () => {
+//     return request(app)
+//       .get("/api")
+//       .expect(200)
+//       .then(({ body }) => {
+//         expect(body.object).toEqual;
+//       });
+//   });
+// });

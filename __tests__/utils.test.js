@@ -10,3 +10,4 @@ describe("getTopicsFromDatabase", () => {
         getTopicsFromDatabase().then((topics) => expect(topics).toEqual(['mitch', 'cats', 'paper']))
     })
 })
+
