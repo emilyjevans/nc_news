@@ -1,5 +1,6 @@
+const request = require("superagent");
 const db = require("../db/connection");
-const { checkTopic } = "../utils/checkTopic.js";
+const { getTopicsFromDatabase } = require("../utils/getTopics")
 
 //Need to add in template literal here //
 exports.selectArticle = (article_id) => {
@@ -72,8 +73,23 @@ exports.selectAllArticles = (
 
   const orderByEntries = ["asc", "desc"];
 
-  // Utils function - check topic exists in database
-  // checkTopic(topic)
+  // Check topic exists in database
+  
+  // async function checkTopic() {
+  //   const topics = await getTopicsFromDatabase()
+  //   return topics;
+  // }
+
+  // const topics = await checkTopic();
+
+  // console.log(topics) /// ?? 
+
+  // if(!topics.includes(topic)){
+  //   return Promise.reject({
+  //     status: 204,
+  //     msg: "No content",
+  //   });
+  // }
 
   if (!sortByEntries.includes(sort_by)) {
     return Promise.reject({

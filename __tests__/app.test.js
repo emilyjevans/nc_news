@@ -159,7 +159,6 @@ describe("ERRORS - PATCH /api/articles/:article_id", () => {
 });
 
 //* This one is supposed to have comment count *//
-//* Need to have filter by author in here too *//
 describe("GET /api/articles", () => {
   it("responds with status 200 and an articles array of article objects", () => {
     return request(app)
@@ -178,6 +177,7 @@ describe("GET /api/articles", () => {
               topic: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
+              //            comment_count: expect.any(Number),
             })
           );
         });
@@ -291,15 +291,25 @@ describe("ERRORS - GET /api/articles", () => {
         expect(body.msg).toEqual("Bad request");
       });
   });
-  it("returns a 400 Not Found for topic which is not in the database", () => {
-    return request(app)
-      .get("/api/articles?topic=not_a_topic")
-      .expect(400)
-      .then((response) => {
-        const { body } = response;
-        expect(body.msg).toEqual("Not found");
-      });
-  }); //Coming back to this when brain is less fried :) Error code 204 when topic exists but no articles
+  // it("returns a 400 Not Found for topic which is not in the database", () => {
+  //   return request(app)
+  //     .get("/api/articles?topic=not_a_topic")
+  //     .expect(400)
+  //     .then((response) => {
+  //       const { body } = response;
+  //       expect(body.msg).toEqual("Not found");
+  //     });
+  // });
+  // it.only("returns a 204 No content for topic which exists but does not have any articles associated with it", () => {
+  //   return request(app)
+  //   .get("/api/articles?topic=paper")
+  //   .expect(204)
+  //   .then((response) => {
+  //     const { body } = response;
+  //     expect(body.msg).toEqual("No content");
+  //   });
+  // });
+  //Coming back to this when brain is less fried :) Error code 204 when topic exists but no articles
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -374,7 +384,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 });
 
 // Error handling
-describe.only("ERRORS POST /api/articles/:article_id/comments", () => {
+describe("ERRORS POST /api/articles/:article_id/comments", () => {
   it("returns a status 400 and bad request for a bad article_id", () => {
     const myComment = {
       username: "lurker",
