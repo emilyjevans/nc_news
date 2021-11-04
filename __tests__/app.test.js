@@ -1,6 +1,6 @@
 const db = require("../db/connection.js");
 const testData = require("../db/data/test-data/index.js");
-const seed  = require("../db/seeds/seed.js");
+const seed = require("../db/seeds/seed.js");
 const request = require("supertest");
 const app = require("../app");
 
@@ -429,17 +429,21 @@ describe("ERRORS POST /api/articles/:article_id/comments", () => {
   });
 });
 
-
 describe("DELETE /api/comments/:comment_id", () => {
   it("Should delete the given comment by comment_id", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+});
+
+// Error handling
+
+describe("ERRORS - DELETE /api/comments/:comment_id", () => {
+  it("Should return 400 Bad request for a comment ID that doesn't exist", () => {
     return request(app)
-    .delete("/api/comments/1")
-    .expect(204)
-  })
-})
-
-// Error handling 
-
-// describe("ERRORS - DELETE /api/comments/:comment_id", () => {
-//   it("Should return 400 Bad request ")
-// })
+      .delete("/api/comments/9999999")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+});
