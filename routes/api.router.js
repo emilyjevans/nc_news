@@ -29,6 +29,6 @@ apiRouter
 
 apiRouter.route("/comments/:comment_id").delete(removeComment);
 
-apiRouter.route("/").get(getEndpoints)
+apiRouter.route("/").get(getEndpoints).all(invalidMethod)
 
 module.exports = { apiRouter };
