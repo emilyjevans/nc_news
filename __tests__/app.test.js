@@ -3,6 +3,8 @@ const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const request = require("supertest");
 const app = require("../app");
+const fs = require('fs')
+
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -454,12 +456,13 @@ describe("ERRORS - DELETE /api/comments/:comment_id", () => {
 });
 
 describe("GET /api", () => {
-  it("should respond with a JSON describing all the available endpoints on the API", () => {
+  it.only("should respond with a JSON describing all the available endpoints on the API", () => {
+    const endpointsFile = require("../endpoints.json")
     return request(app)
       .get("/api")
       .expect(200)
       .then(({ body }) => {
-        // expect(body.object).toEqual;
+        expect(body.endpoints).toEqual(endpointsFile)
       });
   });
 });

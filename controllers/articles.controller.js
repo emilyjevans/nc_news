@@ -61,3 +61,8 @@ exports.removeComment = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getEndpoints = (req, res, next) => {
+  const endpointsFile = require("../endpoints.json")
+  res.status(200).send({endpoints: endpointsFile})
+}
