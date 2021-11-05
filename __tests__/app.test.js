@@ -421,7 +421,7 @@ describe("ERRORS POST /api/articles/:article_id/comments", () => {
       .send(myComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toEqual("Blank comments are not accepted");
+        expect(body.msg).toEqual("Bad request");
       });
   });
 });

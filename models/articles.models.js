@@ -128,7 +128,7 @@ exports.insertComment = (article_id, username, body) => {
   if (!body) {
     return Promise.reject({
       status: 400,
-      msg: `Blank comments are not accepted`,
+      msg: `Bad request`,
     });
   }
   return db
