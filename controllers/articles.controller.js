@@ -5,6 +5,7 @@ const {
   selectCommentsByArticle,
   insertComment,
   deleteComment,
+  selectUsers
 } = require("../models/articles.models.js");
 
 exports.getArticle = (req, res, next) => {
@@ -65,4 +66,10 @@ exports.removeComment = (req, res, next) => {
 exports.getEndpoints = (req, res, next) => {
   const endpointsFile = require("../endpoints.json")
   res.status(200).send({endpoints: endpointsFile})
+}
+
+exports.getUsers = (req, res, next) => {
+  selectUsers().then((data)=>{
+    res.status(200).send({users: data})
+  })
 }

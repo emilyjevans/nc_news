@@ -14,6 +14,7 @@ describe("GET /api/topics ", () => {
       .then((response) => {
         const { body } = response;
         expect(body.topics).toBeInstanceOf(Array);
+
         body.topics.forEach((topic) => {
           expect(topic).toEqual(
             expect.objectContaining({
@@ -26,7 +27,6 @@ describe("GET /api/topics ", () => {
   });
 });
 
-// Error handling
 describe("ERRORS", () => {
   it("Status 404 invalid url", () => {
     return request(app)
@@ -68,8 +68,6 @@ describe("GET /api/articles/:article_id", () => {
       });
   });
 });
-
-// Error handling //
 
 describe("GET /api/articles/:article_id ERRORS", () => {
   it("returns a status 400 and bad request for a bad article_id", () => {
@@ -113,8 +111,6 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-// Error handling
-
 describe("ERRORS - PATCH /api/articles/:article_id", () => {
   it("no inc_votes included on request body, returns status 400 Bad Request", () => {
     return request(app)
@@ -135,7 +131,7 @@ describe("ERRORS - PATCH /api/articles/:article_id", () => {
         const { body } = response;
         expect(body.msg).toEqual("Bad request");
       });
-  }); // Logic already covers this PSQL error
+  });
   it("there's an additional property on the request body, ignores additional property and completes with inc_votes", () => {
     return request(app)
       .patch("/api/articles/3")
@@ -158,7 +154,6 @@ describe("ERRORS - PATCH /api/articles/:article_id", () => {
   });
 });
 
-//* This one is supposed to have comment count *//
 describe("GET /api/articles", () => {
   it("responds with status 200 and an articles array of article objects", () => {
     return request(app)
@@ -177,7 +172,6 @@ describe("GET /api/articles", () => {
               topic: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              //            comment_count: expect.any(Number),
             })
           );
         });
@@ -191,8 +185,6 @@ describe("GET /api/articles", () => {
         const { body } = response;
         expect(body.articles).toBeInstanceOf(Array);
         expect(body.articles).toBeSorted({ ascending: false });
-        // expect(body.articles).toBeSortedBy("created_at")
-        // Does the date data type need converting?
       });
   });
   it("should accept sort_by query", () => {
@@ -270,7 +262,6 @@ describe("GET /api/articles", () => {
   });
 });
 
-// Error handling
 
 describe("ERRORS - GET /api/articles", () => {
   it("returns a 400 bad request for sort_by a column that doesn't exist", () => {
@@ -329,8 +320,6 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-// Error handling
-
 describe("GET /api/articles/:article_id/comments", () => {
   it("returns a 404 not found for an article id that doesn't exist", () => {
     return request(app)
@@ -376,7 +365,6 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
-// Error handling
 describe("ERRORS POST /api/articles/:article_id/comments", () => {
   it("returns a status 400 and bad request for a bad article_id", () => {
     const myComment = {
@@ -432,7 +420,6 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
-// Error handling
 
 describe("ERRORS - DELETE /api/comments/:comment_id", () => {
   it("Should return 400 Bad request for a comment ID that doesn't exist", () => {
@@ -465,11 +452,31 @@ describe("GET /api", () => {
   });
 });
 
-// Error handling
 describe("ERRORS GET /api", () => {
   it("should return 405 error message for invalid methods", () => {
+    return request(app).patch("/api").expect(405);
+  });
+});
+
+describe("GET /api/users", () => {
+  it("responds with an array of objects, each object has the property username", () => {
     return request(app)
-    .patch("/api")
-    .expect(405)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        body.users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
+
+describe("ERRORS GET /api/users", () => {
+  it("should return 405 error message for invalid methods", () => {
+    return request(app).patch("/api/users").expect(405)
   })
 })

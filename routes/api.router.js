@@ -6,7 +6,8 @@ const {
   getCommentsByArticle,
   postComment,
   removeComment,
-  getEndpoints
+  getEndpoints,
+  getUsers
 } = require("../controllers/articles.controller.js");
 const { invalidMethod } = require("../controllers/errors.controller.js");
 const { getTopics } = require("../controllers/topics.controller.js");
@@ -28,6 +29,8 @@ apiRouter
   .all(invalidMethod);
 
 apiRouter.route("/comments/:comment_id").delete(removeComment);
+
+apiRouter.route("/users").get(getUsers).all(invalidMethod)
 
 apiRouter.route("/").get(getEndpoints).all(invalidMethod)
 

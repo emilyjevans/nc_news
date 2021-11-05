@@ -158,3 +158,9 @@ exports.deleteComment = (comment_id) => {
       return rows[0];
     });
 };
+
+exports.selectUsers = () => {
+  return db.query(`SELECT username from users;`).then(({ rows }) => {
+    return rows;
+  });
+};
