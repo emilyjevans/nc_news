@@ -171,7 +171,7 @@ describe("GET /api/articles", () => {
               topic: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              comment_count: expect.any(Number)
+              comment_count: expect.any(Number),
             })
           );
         });
@@ -184,7 +184,7 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const { body } = response;
         expect(body.articles).toBeInstanceOf(Array);
-        expect(body.articles).toBeSortedBy('created_at', { descending: true });
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
       });
   });
   it("should accept sort_by query", () => {
@@ -194,7 +194,7 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const { body } = response;
         expect(body.articles).toBeInstanceOf(Array);
-        expect(body.articles).toBeSortedBy("article_id", {descending:true});
+        expect(body.articles).toBeSortedBy("article_id", { descending: true });
       });
   });
   it("should accept ascending or descending", () => {
@@ -241,6 +241,16 @@ describe("GET /api/articles", () => {
         });
       });
   });
+  it("should be able to sort by author", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toBeSortedBy("author", { descending: true });
+      });
+  });
   it("should be able to use all three queries", () => {
     return request(app)
       .get("/api/articles?topic=cats&order=asc&sort_by=article_id")
@@ -261,7 +271,6 @@ describe("GET /api/articles", () => {
       });
   });
 });
-
 
 describe("ERRORS - GET /api/articles", () => {
   it("returns a 400 bad request for sort_by a column that doesn't exist", () => {
@@ -392,14 +401,14 @@ describe("ERRORS POST /api/articles/:article_id/comments", () => {
         expect(body.msg).toEqual("Bad request");
       });
   });
-  it("returns a 400 and bad request for a username that doesn't exist", () => {
+  it("returns a 404 and not found for a username that doesn't exist", () => {
     const myComment = { username: "emily", body: "A very interesting comment" };
     return request(app)
       .post("/api/articles/3/comments")
       .send(myComment)
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toEqual("Bad request");
+        expect(body.msg).toEqual("Not found");
       });
   });
   it("returns a 400 for an empty comment", () => {
@@ -419,7 +428,6 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app).delete("/api/comments/1").expect(204);
   });
 });
-
 
 describe("ERRORS - DELETE /api/comments/:comment_id", () => {
   it("Should return 400 Bad request for a comment ID that doesn't exist", () => {
@@ -477,6 +485,6 @@ describe("GET /api/users", () => {
 
 describe("ERRORS GET /api/users", () => {
   it("should return 405 error message for invalid methods", () => {
-    return request(app).patch("/api/users").expect(405)
-  })
-})
+    return request(app).patch("/api/users").expect(405);
+  });
+});
