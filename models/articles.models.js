@@ -84,23 +84,26 @@ exports.selectAllArticles = async (
     });
   }
 
-  let sqlQuery = `SELECT * FROM articles`;
-  const queries = [sort_by, order];
+  let sqlQuery = `SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, COUNT(comments.article_id)::Int AS comment_count
+  from articles
+  LEFT JOIN comments ON articles.article_id = comments.article_id`;
+  const queries = [];
 
   if (topic !== null && author !== null) {
-    sqlQuery += ` WHERE topic = $3 AND author = $4`;
+    sqlQuery += ` WHERE topic = $1 AND author = $2`;
+    queries.push(topic);
     queries.push(author);
   }
   if (topic !== null && author === null) {
-    sqlQuery += ` WHERE topic = $3`;
+    sqlQuery += ` WHERE topic = $1`;
     queries.push(topic);
   }
   if (author !== null && topic === null) {
-    sqlQuery += ` WHERE author = $3`;
+    sqlQuery += ` WHERE articles.author = $1`;
     queries.push(author);
   }
 
-  sqlQuery += ` ORDER BY $1, $2`;
+  sqlQuery += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
 
   const { rows } = await db.query(sqlQuery, queries);
 

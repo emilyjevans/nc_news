@@ -168,10 +168,10 @@ describe("GET /api/articles", () => {
               author: expect.any(String),
               title: expect.any(String),
               article_id: expect.any(Number),
-              body: expect.any(String),
               topic: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
+              comment_count: expect.any(Number)
             })
           );
         });
@@ -184,7 +184,7 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const { body } = response;
         expect(body.articles).toBeInstanceOf(Array);
-        expect(body.articles).toBeSorted({ ascending: false });
+        expect(body.articles).toBeSortedBy('created_at', { descending: true });
       });
   });
   it("should accept sort_by query", () => {
@@ -194,7 +194,7 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const { body } = response;
         expect(body.articles).toBeInstanceOf(Array);
-        expect(body.articles).toBeSortedBy("article_id");
+        expect(body.articles).toBeSortedBy("article_id", {descending:true});
       });
   });
   it("should accept ascending or descending", () => {
@@ -204,7 +204,7 @@ describe("GET /api/articles", () => {
       .then((response) => {
         const { body } = response;
         expect(body.articles).toBeInstanceOf(Array);
-        expect(body.articles).toBeSorted({ ascending: true });
+        expect(body.articles).toBeSorted({ descending: true });
       });
   });
   it("should be able to filter by topic", () => {
@@ -249,7 +249,7 @@ describe("GET /api/articles", () => {
         const { body } = response;
         expect(body.articles).toBeInstanceOf(Array);
         expect(body.articles).toHaveLength(1);
-        expect(body.articles).toBeSorted({ ascending: true });
+        expect(body.articles).toBeSorted({ descending: true });
         expect(body.articles).toBeSortedBy("article_id");
         body.articles.forEach((article) => {
           expect(article).toEqual(
