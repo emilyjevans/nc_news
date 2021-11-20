@@ -93,7 +93,7 @@ describe("PATCH /api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/3")
       .send({ inc_votes: 5 })
-      .expect(201)
+      .expect(200)
       .then((response) => {
         const { body } = response;
         expect(body.article).toEqual(
@@ -116,10 +116,20 @@ describe("ERRORS - PATCH /api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/3")
       .send({ not_the_right_thing: "pasta" })
-      .expect(400)
+      .expect(200)
       .then((response) => {
         const { body } = response;
-        expect(body.msg).toEqual("Bad request");
+        expect(body.article).toEqual(
+          expect.objectContaining({
+            author: "icellusedkars",
+            title: "Eight pug gifs that remind me of mitch",
+            article_id: 3,
+            body: expect.any(String),
+            topic: "mitch",
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          })
+        );
       });
   });
   it("invalid inc_votes eg. { inc_votes : 'cat' }, returns 400 Bad Request", () => {
@@ -136,7 +146,7 @@ describe("ERRORS - PATCH /api/articles/:article_id", () => {
     return request(app)
       .patch("/api/articles/3")
       .send({ inc_votes: 5, name: "Mitch" })
-      .expect(201)
+      .expect(200)
       .then((response) => {
         const { body } = response;
         expect(body.article).toEqual(
@@ -148,6 +158,26 @@ describe("ERRORS - PATCH /api/articles/:article_id", () => {
             topic: "mitch",
             created_at: expect.any(String),
             votes: 5,
+          })
+        );
+      });
+  });
+  it("ignores a `patch` request with no information in the request body, and send the unchanged article to the client", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({})
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.article).toEqual(
+          expect.objectContaining({
+            author: "icellusedkars",
+            title: "Eight pug gifs that remind me of mitch",
+            article_id: 3,
+            body: expect.any(String),
+            topic: "mitch",
+            created_at: expect.any(String),
+            votes: expect.any(Number),
           })
         );
       });
@@ -300,8 +330,14 @@ describe("ERRORS - GET /api/articles", () => {
         expect(body.msg).toEqual("Not found");
       });
   });
-  it("returns a 204 No content for topic which exists but does not have any articles associated with it", () => {
-    return request(app).get("/api/articles?topic=paper").expect(204);
+  it("returns a 200 and an empty array for topic which exists but does not have any articles associated with it", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then((response) => {
+        const { body } = response;
+        expect(body.articles).toEqual([]);
+      });
   });
 });
 
@@ -327,6 +363,15 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
       });
   });
+  it("should respond with a 200 and empty array for an article that exists but has no comments", () => {
+    return request(app)
+    .get("/api/articles/2/comments")
+    .expect(200)
+    .then((response) => {
+      const {body} = response;
+      expect(body.comments).toEqual([])
+    })
+  })
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -388,7 +433,7 @@ describe("ERRORS POST /api/articles/:article_id/comments", () => {
         expect(body.msg).toEqual("Bad request");
       });
   });
-  it("returns a 400 and bad request for an article_id that doesn't exist", () => {
+  it("returns a 404 and Not found for an article_id that doesn't exist", () => {
     const myComment = {
       username: "lurker",
       body: "A very interesting comment",
@@ -396,9 +441,9 @@ describe("ERRORS POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/999999/comments")
       .send(myComment)
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toEqual("Bad request");
+        expect(body.msg).toEqual("Not found");
       });
   });
   it("returns a 404 and not found for a username that doesn't exist", () => {
@@ -413,6 +458,16 @@ describe("ERRORS POST /api/articles/:article_id/comments", () => {
   });
   it("returns a 400 for an empty comment", () => {
     const myComment = { username: "lurker" };
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(myComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+  it("returns a 400 for an empty username", () => {
+    const myComment = { body: "A controversial comment" };
     return request(app)
       .post("/api/articles/3/comments")
       .send(myComment)

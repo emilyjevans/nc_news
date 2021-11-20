@@ -31,13 +31,7 @@ exports.selectArticle = (article_id) => {
     });
 };
 
-exports.increaseVotes = (article_id, inc_votes) => {
-  if (!inc_votes) {
-    return Promise.reject({
-      status: 400,
-      msg: "Bad request",
-    });
-  }
+exports.increaseVotes = (article_id, inc_votes = 0) => {
   return db
     .query(
       `UPDATE articles 
@@ -113,22 +107,19 @@ exports.selectAllArticles = async (
   return rows;
 };
 
-exports.selectCommentsByArticle = (article_id) => {
+exports.selectCommentsByArticle = async (article_id) => {
+  const article = await this.selectArticle(article_id);
+  if (article.status === 404) return Promise.reject(article);
+
   return db
     .query(`SELECT * FROM comments WHERE article_id = $1`, [article_id])
     .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: `No article found for article_id: ${article_id}`,
-        });
-      }
       return rows;
     });
 };
 
 exports.insertComment = (article_id, username, body) => {
-  if (!body) {
+  if (!body || !username) {
     return Promise.reject({
       status: 400,
       msg: `Bad request`,

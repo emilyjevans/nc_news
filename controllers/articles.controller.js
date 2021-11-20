@@ -19,7 +19,7 @@ exports.patchArticle = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
   increaseVotes(article_id, inc_votes)
-    .then((data) => res.status(201).send({ article: data }))
+    .then((data) => res.status(200).send({ article: data }))
     .catch(next);
 };
 
@@ -27,9 +27,6 @@ exports.getAllArticles = (req, res, next) => {
   const { sort_by, order, topic, author } = req.query;
   selectAllArticles(sort_by, order, topic, author)
     .then((data) => {
-      if (data.length === 0) {
-        res.status(204).send();
-      }
       res.status(200).send({ articles: data });
     })
     .catch(next);

@@ -9,7 +9,7 @@ exports.PSQLerror = (err, req, res, next) => {
   }
   if (err.code === "23503") {
     //FOREIGN KEY VIOLATION
-    res.status(400).send({ msg: "Bad request" });
+    res.status(404).send({ msg: "Not found" });
   } else {
     next(err);
   }
