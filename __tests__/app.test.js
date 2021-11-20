@@ -417,6 +417,29 @@ describe("POST /api/articles/:article_id/comments", () => {
         );
       });
   });
+  it("should ignore unnecessary properties", () => {
+    const myComment = {
+      username: "lurker",
+      body: "A very interesting comment",
+      extra: "Extra property"
+    };
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send(myComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            body: "A very interesting comment",
+            votes: 0,
+            author: "lurker",
+            article_id: 3,
+            created_at: expect.any(String),
+          })
+        );
+      });
+  })
 });
 
 describe("ERRORS POST /api/articles/:article_id/comments", () => {
@@ -485,12 +508,12 @@ describe("DELETE /api/comments/:comment_id", () => {
 });
 
 describe("ERRORS - DELETE /api/comments/:comment_id", () => {
-  it("Should return 400 Bad request for a comment ID that doesn't exist", () => {
+  it("Should return 404 Not found for a comment ID that doesn't exist", () => {
     return request(app)
       .delete("/api/comments/9999999")
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toEqual("Bad request");
+        expect(body.msg).toEqual("Not found");
       });
   });
   it("Should return 400 Bad request for a badly formed comment ID", () => {
