@@ -110,7 +110,7 @@ exports.selectCommentsByArticle = async (article_id) => {
   if (article.status === 404) return Promise.reject(article);
 
   return db
-    .query(`SELECT * FROM comments WHERE article_id = $1`, [article_id])
+    .query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`, [article_id])
     .then(({ rows }) => {
       return rows;
     });
