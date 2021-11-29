@@ -1,36 +1,67 @@
+# News API
 
-# News API 
+## Project summary
 
-The hosted version of the app can be found [here](https://whats-the-goss.herokuapp.com/).
+This project is intended to be a news thread application similar to Reddit. The database hosts a number of articles and their respective comments, and users have the ability to add comments, increase or decrease votes on the articles and delete comments.
 
-## Project summary 
+## Pre requisites
 
-This project is intended to be an news thread application similar to Reddit. The database hosts a number of articles and their respective comments, and users have the ability to add comments, increase or decrease votes on the articles and delete comments. 
+Node.js is required as the runtime environment for the project. Details on how to install node can be found [here](https://nodejs.org/en/download/current/).
 
-## Instructions 
+Minimum version recommended for running this project: Node v16
 
-The project can be cloned from github via the following command:
+Minimum version recommended for running this project: Postgres - v8.7.1
 
-```git clone https://github.com/emilyjevans94/nc_news```
+## Links
 
-Install dependencies:
+[Hosted version](https://whats-the-goss.herokuapp.com/)
 
-```npm install```
+[Front-end repository](https://github.com/emilyjevans/whats-the-goss)
 
-Seed local database: 
+[Hosted front-end](https://mystifying-einstein-e278c9.netlify.app)
 
-```npm run seed```
+## Instructions
 
-Run tests: 
+Firstly, the project can be cloned from github via the following command:
 
-```npm run test```
+### `git clone https://github.com/emilyjevans94/nc_news`
 
-Create two .env files: 
+Change directory to the project's directory:
 
-In the main directory, two files will be needed called '.env.development' and '.env.test' 
-The contents of these will be of the form 'PGDATABASE = ' and the name of the database to be connected to. 
+### `cd nc_news`
 
+Install required dependencies:
 
-## Minimum versions required 
-Node.js - v16.7.0 
-Postgres - v8.7.1
+### `npm install`
+
+Create two .env files in the root directory:
+
+### `touch .env.development`
+
+and
+
+### `touch .env.test`
+
+Add database config to the .env files:
+
+.env.development:
+
+### `PGDATABASE = nc_news`
+
+.env.test:
+
+### `PGDATABASE = nc_news_test`
+
+Seed local database:
+
+### `npm run setup-dbs`
+
+### `npm run seed`
+
+Run tests:
+
+### `npm run test`
+
+Run server:
+
+### `npm run start`
